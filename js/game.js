@@ -3,26 +3,21 @@
   var game = {};
 
   game.init = function(){
+    game.players = {};
     game.socket = io.connect('http://localhost:4000');
-
 
     game.canvas = document.getElementById("canvas");
 
     game.socket.on('connect', function(data){
-      game.cell = data.c;
-      game.line = data.l;
-      document.getElementById("canvas").width = data.w;
-      document.getElementById("canvas").height = data.h;
+      game.cell = (data != undefined) ? data.c : game.cell;
+      game.line = (data != undefined) ? data.l : game.line;
+      document.getElementById("canvas").width = (data != undefined) ? data.w : document.getElementById("canvas").width;
+      document.getElementById("canvas").height= (data != undefined) ? data.h : document.getElementById("canvas").height;
     });
 
     game.socket.on('draw', function(data){
-      return game.draw(data.obj, data.x, data.y);
+      game.players = data.players;
     });
-
-
-    game.draw = function(obj, x, y){
-
-    }
 
     game.ctx = game.canvas.getContext("2d");
     game.update();
@@ -34,7 +29,22 @@
 	  game.ctx.closePath();
 	  game.ctx.fillStyle = color;
 	  game.ctx.fill();
-	}
+	};
+
+  game.drawPlayers = function(){
+    for(var i=0; i<game.players.length; i++){
+      if(game.players[i].player.alive === true){
+        for(var j=0; j<game.players[i].player.body.length; j++){
+          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[0].y*(game.line+game.cell)+(game.line/2), "#f00" );
+        }
+      }
+      else{
+        for(var j=0; j<game.players[i].player.body.length; j++){
+          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[0].y*(game.line+game.cell)+(game.line/2), "#fff" );
+        }
+      }
+    }
+  };
 
 	game.drawBackground = function(){
 	  canvas.width = canvas.width;
@@ -43,19 +53,20 @@
 	  	  game.drawRect(i+game.line, j+game.line, "#000");
 	  	}
 	  }
-	}
-
+	};
 
   game.update = function(){
     game.drawBackground();
+    game.drawPlayers();
 
     setTimeout(function(){return game.update()}, 100);
   }
 
+  document.onkeydown = function(e){
+    game.socket.emit("keyDown", {
+      keyCode: e.keyCode
+    });
+  }
 
-  $(function(){
-    return game.init();
-  });
-
+  game.init();
 }).call(this);
-
