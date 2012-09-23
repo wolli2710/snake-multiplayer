@@ -12,6 +12,10 @@ exports.Snake = function(server){
     return interval;
   };
 
+  this.setInterval = function(interv){
+    interval = interv;
+  }
+
 	this.getPosition = function(){
 	  return that.body;
 	};
@@ -48,11 +52,13 @@ exports.Snake = function(server){
 	}
 
   this.body = this.init();
-  this.grow({x:this.body[0].x-1, y:this.body[0].y});
-  this.grow({x:this.body[0].x-2, y:this.body[0].y});
+  for(var i =0; i<14;i++){
+    this.grow({x:this.body[0].x-i, y:this.body[0].y});
+  }
   this.alive = true;
+  this.gameOver = false;
 
-	this.updatePosition = function(){
+  this.updatePosition = function(){
 	  var l = that.body.length-1;
     if(that.isAlive()){
       for(var i = l; i>=0; i--){
@@ -68,15 +74,27 @@ exports.Snake = function(server){
           if(that.isColliding(i) === 1){
             console.log("GAME OVER");
             that.alive = false;
-            //throw "stop execution";
+            return 0;
           }
         }
       }
     }
+    setTimeout(function(){that.updatePosition()}, that.getInterval());
 	};
+
+  this.setDirection = function(dir){
+    direction = dir;
+  }
+
+  this.getDirection = function(){
+    return direction;
+  }
+
+  this.updatePosition();
 
   return this;
 }
+
 
 
 Array.prototype.isUnique = function(obj){

@@ -12,6 +12,9 @@
   //var fieldHeight = 0;
   var that = this;
 
+  //save sockets per client
+  var clients = [];
+
   this.fieldWidth  = 0;
   this.fieldHeight = 0;
 
@@ -23,13 +26,31 @@
     return that.fieldHeight;
   };
 
+  var isGameOver = function(){
+    var l = players.length;
+    for(var i = 0; i< l; i++){
+      var p = players[i].player;
+      if(p.alive === false){
+        if(p.gameOver === false){
+          clients[players[i].id].emit('gameOver', {
+            msg: "You are Game Over"
+          });
+          p.gameOver = true;
+        }
+      }
+    }
+  }
+
   //gameLoop
-  var gameLoop = function(player){
-    player.updatePosition();
+  //bug
+  this.gameLoop = function(){//player){
+    isGameOver();
+
+    //player.updatePosition();
     io.sockets.emit('draw', {
       "players": players
     });
-    setTimeout(function(){gameLoop(player)}, player.getInterval());
+    setTimeout(function(){that.gameLoop()}, 200);//player.getInterval());
   }
 
   //realtime server
@@ -39,6 +60,7 @@
     canvasHeight += 20;
     that.fieldHeight = canvasHeight / (cell+line);
     that.fieldWidth  = canvasWidth / (cell+line);
+    clients[socket.id] = socket;
 
     //grow canvas
     io.sockets.emit('connect', {
@@ -52,38 +74,45 @@
     var player = new snake.Snake( that );
     players.push({"id":id, "player":player});
 
-    gameLoop(player);
+    that.gameLoop();
 
     socket.on('keyDown', function(data){
-      console.log(data.keyCode);
+      //bug ->build a separate data structure with all snakes...
+      var player = {};
+      for(var i = 0; i<players.length; i++){
+        if(players[i].id === socket.id){
+          player = players[i].player;
+        }
+      }
 
+      //if keyCode is allowed change direction
       switch(data.keyCode){
         case 38:
-          if(that.body[1].x !== that.body[0].x && that.body[1].y-1 !== that.body[0].y){
-            direction = "u";
+          if(player.body[1].x !== player.body[0].x && player.body[1].y-1 !== player.body[0].y){
+            player.setDirection("u");
           }
           break;
         case 40:
-          if(that.body[1].x !== that.body[0].x && that.body[1].y+1 !== that.body[0].y){
-            direction = "d";
+          if(player.body[1].x !== player.body[0].x && player.body[1].y+1 !== player.body[0].y){
+            player.setDirection("d");
           }
           break;
         case 37:
-          if(that.body[1].x-1 !== that.body[0].x && that.body[1].y !== that.body[0].y){
-            direction = "l";
+          if(player.body[1].x-1 !== player.body[0].x && player.body[1].y !== player.body[0].y){
+            player.setDirection("l");
           }
           break;
         case 39:
-          if(that.body[1].x+1 !== that.body[0].x && that.body[1].y !== that.body[0].y){
-            direction = "r";
+          if(player.body[1].x+1 !== player.body[0].x && player.body[1].y !== player.body[0].y){
+            player.setDirection("r");
           }
           break;
       }
-
     });
 
     socket.on('disconnect', function(){
       console.log("disconnected " + socket.id);
     });
+
   });
 }).call(this);

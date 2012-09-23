@@ -15,6 +15,10 @@
       document.getElementById("canvas").height= (data != undefined) ? data.h : document.getElementById("canvas").height;
     });
 
+    game.socket.on('gameOver', function(data){
+      alert(data.msg);
+    });
+
     game.socket.on('draw', function(data){
       game.players = data.players;
     });
@@ -35,12 +39,12 @@
     for(var i=0; i<game.players.length; i++){
       if(game.players[i].player.alive === true){
         for(var j=0; j<game.players[i].player.body.length; j++){
-          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[0].y*(game.line+game.cell)+(game.line/2), "#f00" );
+          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[j].y*(game.line+game.cell)+(game.line/2), "#f00" );
         }
       }
       else{
         for(var j=0; j<game.players[i].player.body.length; j++){
-          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[0].y*(game.line+game.cell)+(game.line/2), "#fff" );
+          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[j].y*(game.line+game.cell)+(game.line/2), "#fff" );
         }
       }
     }
