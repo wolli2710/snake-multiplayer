@@ -39,6 +39,9 @@ exports.Snake = function(server){
 	  if(that.body.isUnique(that.body[i]) === 0){
 	  	return 1;
 	  }
+    if(that.body.collision(server.players) === 0){
+      return 1;
+    }
 	};
 
 	this.isEating = function(obj){
@@ -100,10 +103,25 @@ exports.Snake = function(server){
 Array.prototype.isUnique = function(obj){
   var l = this.length,
   counter = 0;
-  for(i=0; i<l; i++){
+  for(var i=0; i<l; i++){
   	if(this[i].x === obj.x && this[i].y === obj.y){
   		counter++;
   	}
   }
   return (counter >= 2) ? 0 : 1;
+}
+
+
+Array.prototype.collision = function(obj){
+  var l = obj.length;
+  for(var i=0; i<l; i++){
+    var bdy = obj[i].player.body
+    if(bdy !== this){
+      var str = JSON.stringify(bdy);
+      if(str.indexOf(JSON.stringify(this[0])) !== -1){
+        return 0;
+      }
+    }
+  }
+  return 1;
 }

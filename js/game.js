@@ -4,7 +4,7 @@
 
   game.init = function(){
     game.players = {};
-    game.socket = io.connect('http://localhost:4000');
+    game.socket = io.connect('http://localhost:4002');
 
     game.canvas = document.getElementById("canvas");
 

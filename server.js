@@ -1,20 +1,19 @@
 (function() {
-  var io = require('socket.io').listen(4000);
+  var io = require('socket.io').listen(4002);
   var snake = require('./snake.js');
-  var players = [];
   //canvas setup
   var canvasWidth = 300;
   var canvasHeight = 200;
   //field variables
   var cell = 8;
   var line = 2;
-  //var fieldWidth = 0;
-  //var fieldHeight = 0;
+
   var that = this;
 
   //save sockets per client
   var clients = [];
 
+  this.players = [];
   this.fieldWidth  = 0;
   this.fieldHeight = 0;
 
@@ -27,12 +26,12 @@
   };
 
   var isGameOver = function(){
-    var l = players.length;
+    var l = that.players.length;
     for(var i = 0; i< l; i++){
-      var p = players[i].player;
+      var p = that.players[i].player;
       if(p.alive === false){
         if(p.gameOver === false){
-          clients[players[i].id].emit('gameOver', {
+          clients[that.players[i].id].emit('gameOver', {
             msg: "You are Game Over"
           });
           p.gameOver = true;
@@ -48,7 +47,7 @@
 
     //player.updatePosition();
     io.sockets.emit('draw', {
-      "players": players
+      "players": that.players
     });
     setTimeout(function(){that.gameLoop()}, 200);//player.getInterval());
   }
@@ -72,16 +71,16 @@
 
     //init player
     var player = new snake.Snake( that );
-    players.push({"id":id, "player":player});
+    that.players.push({"id":id, "player":player});
 
     that.gameLoop();
 
     socket.on('keyDown', function(data){
       //bug ->build a separate data structure with all snakes...
       var player = {};
-      for(var i = 0; i<players.length; i++){
-        if(players[i].id === socket.id){
-          player = players[i].player;
+      for(var i = 0; i<that.players.length; i++){
+        if(that.players[i].id === socket.id){
+          player = that.players[i].player;
         }
       }
 
@@ -116,3 +115,5 @@
 
   });
 }).call(this);
+
+
