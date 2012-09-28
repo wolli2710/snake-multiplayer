@@ -4,6 +4,7 @@
 
   game.init = function(){
     game.players = {};
+    game.items = {};
     game.socket = io.connect('http://localhost:4002');
 
     game.canvas = document.getElementById("canvas");
@@ -21,6 +22,7 @@
 
     game.socket.on('draw', function(data){
       game.players = data.players;
+      game.items = data.items;
     });
 
     game.ctx = game.canvas.getContext("2d");
@@ -36,10 +38,12 @@
 	};
 
   game.drawPlayers = function(){
-    for(var i=0; i<game.players.length; i++){
+    var pl = game.players.length;
+    for(var i=0; i<pl; i++){
       if(game.players[i].player.alive === true){
-        for(var j=0; j<game.players[i].player.body.length; j++){
-          game.drawRect(game.players[i].player.body[j].x*(game.line+game.cell)+(game.line/2), game.players[i].player.body[j].y*(game.line+game.cell)+(game.line/2), "#f00" );
+        var b = game.players[i].player.body;
+        for(var j=0; j<b.length; j++){
+          game.drawRect(b[j].x*(game.line+game.cell)+(game.line/2), b[j].y*(game.line+game.cell)+(game.line/2), "#f00" );
         }
       }
       else{
@@ -49,6 +53,19 @@
       }
     }
   };
+
+  game.drawItems = function(){
+    var il = game.items.length;
+    for(var i=0; i<il; i++){
+      var item = game.items[i].item;
+      var color = "#777";
+      if(item.type === "s"){color = "#fff"}
+      else if(item.type === "m"){color ="#f00";}
+      else if(item.type === "b"){color="#ff0";}
+      else if(item.type === "f"){color="#f0f";}
+      game.drawRect(item.x*(game.line+game.cell)+(game.line/2), item.y*(game.line+game.cell)+(game.line/2), color);
+    }
+  }
 
 	game.drawBackground = function(){
 	  canvas.width = canvas.width;
@@ -62,6 +79,7 @@
   game.update = function(){
     game.drawBackground();
     game.drawPlayers();
+    game.drawItems();
 
     setTimeout(function(){return game.update()}, 100);
   }

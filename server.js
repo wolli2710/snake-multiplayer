@@ -1,6 +1,7 @@
 (function() {
   var io = require('socket.io').listen(4002);
   var snake = require('./snake.js');
+  var obj  = require('./item.js');
   //canvas setup
   var canvasWidth = 300;
   var canvasHeight = 200;
@@ -14,6 +15,7 @@
   var clients = [];
 
   this.players = [];
+  this.items = [];
   this.fieldWidth  = 0;
   this.fieldHeight = 0;
 
@@ -47,9 +49,10 @@
 
     //player.updatePosition();
     io.sockets.emit('draw', {
-      "players": that.players
+      "players": that.players,
+      "items": that.items
     });
-    setTimeout(function(){that.gameLoop()}, 200);//player.getInterval());
+    setTimeout(function(){that.gameLoop()}, 50);//player.getInterval());
   }
 
   //realtime server
@@ -72,6 +75,9 @@
     //init player
     var player = new snake.Snake( that );
     that.players.push({"id":id, "player":player});
+    //init item
+    var item = new obj.Item();
+    that.items.push({"item":item});
 
     that.gameLoop();
 
