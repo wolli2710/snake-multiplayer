@@ -1,11 +1,13 @@
 exports.Colorgenerator = function(){
   var that = this;
+  this.arr = "#";
 
   this.initColor = function(){
-    var arr = "#";
-    for(var i=0; i<3; i++){
-      arr += Math.floor(Math.random()*(15-0)).toString(16);
+    for(var i=0; i<6; i++){
+      this.arr += Math.floor(Math.random()*(15-5)).toString(16);
     }
-    return arr;
+    return this.arr;
   }
+
+  return this.initColor();;
 }
