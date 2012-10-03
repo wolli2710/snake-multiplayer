@@ -15,6 +15,7 @@
   var clients = [];
 
   this.players = [];
+  this.playersSocketSort = [];
   this.items = [];
   this.fieldWidth  = 0;
   this.fieldHeight = 0;
@@ -27,11 +28,18 @@
     return that.fieldHeight;
   };
 
+  var clear = function(){
+    that.players = [];
+    that.items = [];
+  }
+
   var isGameOver = function(){
     var l = that.players.length;
+    var deadCount = 0;
     for(var i = 0; i< l; i++){
       var p = that.players[i].player;
       if(p.alive === false){
+        deadCount++;
         if(p.gameOver === false){
           clients[that.players[i].id].emit('gameOver', {
             msg: "You are Game Over"
@@ -39,6 +47,9 @@
           p.gameOver = true;
         }
       }
+    }
+    if(deadCount === that.players.length){
+      clear();
     }
   }
 
@@ -52,7 +63,7 @@
       "players": that.players,
       "items": that.items
     });
-    setTimeout(function(){that.gameLoop()}, 50);//player.getInterval());
+    setTimeout(function(){that.gameLoop()}, 70);//player.getInterval());
   }
 
   //realtime server
@@ -75,41 +86,37 @@
     //init player
     var player = new snake.Snake( that );
     that.players.push({"id":id, "player":player});
+    //init player with socket id
+    that.playersSocketSort[socket.id] = player;
     //init item
-    var item = new obj.Item();
+    var item = new obj.Item( that );
     that.items.push({"item":item});
 
     that.gameLoop();
 
     socket.on('keyDown', function(data){
-      //bug ->build a separate data structure with all snakes...
-      var player = {};
-      for(var i = 0; i<that.players.length; i++){
-        if(that.players[i].id === socket.id){
-          player = that.players[i].player;
-        }
-      }
+      var currentPlayer = that.playersSocketSort[socket.id];
 
-      //if keyCode is allowed change direction
+      //if direction is allowed change direction
       switch(data.keyCode){
         case 38:
-          if(player.body[1].x !== player.body[0].x && player.body[1].y-1 !== player.body[0].y){
-            player.setDirection("u");
+          if(currentPlayer.body[1].x !== currentPlayer.body[0].x && currentPlayer.body[1].y-1 !== currentPlayer.body[0].y){
+            currentPlayer.setDirection("u");
           }
           break;
         case 40:
-          if(player.body[1].x !== player.body[0].x && player.body[1].y+1 !== player.body[0].y){
-            player.setDirection("d");
+          if(currentPlayer.body[1].x !== currentPlayer.body[0].x && currentPlayer.body[1].y+1 !== currentPlayer.body[0].y){
+            currentPlayer.setDirection("d");
           }
           break;
         case 37:
-          if(player.body[1].x-1 !== player.body[0].x && player.body[1].y !== player.body[0].y){
-            player.setDirection("l");
+          if(currentPlayer.body[1].x-1 !== currentPlayer.body[0].x && currentPlayer.body[1].y !== currentPlayer.body[0].y){
+            currentPlayer.setDirection("l");
           }
           break;
         case 39:
-          if(player.body[1].x+1 !== player.body[0].x && player.body[1].y !== player.body[0].y){
-            player.setDirection("r");
+          if(currentPlayer.body[1].x+1 !== currentPlayer.body[0].x && currentPlayer.body[1].y !== currentPlayer.body[0].y){
+            currentPlayer.setDirection("r");
           }
           break;
       }
@@ -121,5 +128,3 @@
 
   });
 }).call(this);
-
-

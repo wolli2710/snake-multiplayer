@@ -1,7 +1,8 @@
-exports.Item = function(){
+exports.Item = function(server){
 
-  var that  = this,
-      types = ["f", "m", "s", "b"];
+  var that  = this;
+  var types = ["f", "m", "s", "b"];
+  var util = require('./utilities.js');
 
   //type f = food / m = mine / s = speedup / b = breake
   this.type = "f"; // getType();
@@ -16,8 +17,8 @@ exports.Item = function(){
 
   this.getNewPosition = function(){
     that.type = that.getType();
-    that.x = Math.floor(Math.random()* 8);
-    that.y = Math.floor(Math.random()* 8);
+    that.x = util.randInt(0, server.fieldWidth-1)
+    that.y = util.randInt(0, server.fieldHeight-1)
   }
 
   return this;

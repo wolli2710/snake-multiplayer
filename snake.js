@@ -1,16 +1,16 @@
-
-
 exports.Snake = function(server){
-  var color = require('./colorgenerator.js');
+  var col = require('./colorgenerator.js');
+  var util = require('./utilities.js');
+
   var that = this,
       direction = "r";
 
       this.interval = 800;
-      this.col = new color.Colorgenerator();
+      this.color = new col.Colorgenerator();
 
   this.init = function(){
-    console.log(that.col.initColor());
-    var startPoint = [{x:Math.floor(server.fieldWidth-server.fieldWidth/2), y:server.fieldHeight-1}]
+    console.log(that.color.arr);
+    var startPoint = [{x:util.randInt(5, server.fieldWidth-1), y: server.fieldHeight-1}]
     return startPoint;
   }
 
@@ -78,13 +78,16 @@ exports.Snake = function(server){
             //if mine game over ...
             switch(currentItem.type){
               case "s": that.setInterval(200);
+                        currentItem.getNewPosition();
               break;
               case "f": that.grow(that.body[l-1]);
                         currentItem.getNewPosition();
               break;
               case "b": that.setInterval(800);
+                        currentItem.getNewPosition();
               break;
               case "m": that.alive = false;
+                        currentItem.getNewPosition();
               break;
             }
           }

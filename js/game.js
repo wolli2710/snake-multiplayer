@@ -5,6 +5,7 @@
   game.init = function(){
     game.players = {};
     game.items = {};
+//    game.socket = io.connect('http://io.wolfgang-vogl.com:9000');
     game.socket = io.connect('http://localhost:4002');
 
     game.canvas = document.getElementById("canvas");
@@ -43,7 +44,7 @@
       if(game.players[i].player.alive === true){
         var b = game.players[i].player.body;
         for(var j=0; j<b.length; j++){
-          game.drawRect(b[j].x*(game.line+game.cell)+(game.line/2), b[j].y*(game.line+game.cell)+(game.line/2), "#f00" );
+          game.drawRect(b[j].x*(game.line+game.cell)+(game.line/2), b[j].y*(game.line+game.cell)+(game.line/2), game.players[i].player.color.arr);
         }
       }
       else{
