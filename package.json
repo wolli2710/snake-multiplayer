@@ -1,0 +1,12 @@
+{
+  "name": "snake-multiplayer",
+  "version": "0.0.1",
+  "author": "Wolfgang Vogl <wvogl.mmt-m2012@fh-salzburg.ac.at>",
+  "dependencies": {
+    "socket.io": "0.9.x"
+  },
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  }
+}
