@@ -2,33 +2,44 @@
 
   var game = {};
 
-  game.init = function(){
-    game.players = {};
-    game.items = {};
-//    game.socket = io.connect('http://io.wolfgang-vogl.com:9000');
-    game.socket = io.connect('http://localhost:4002');
-
-    game.canvas = document.getElementById("canvas");
-
+  var socketConnectHandler = function(){
     game.socket.on('connect', function(data){
       game.cell = (data != undefined) ? data.c : game.cell;
       game.line = (data != undefined) ? data.l : game.line;
       document.getElementById("canvas").width = (data != undefined) ? data.w : document.getElementById("canvas").width;
       document.getElementById("canvas").height= (data != undefined) ? data.h : document.getElementById("canvas").height;
     });
+  };
 
-    game.socket.on('gameOver', function(data){
-      alert(data.msg);
-    });
-
+  var socketDrawHandler = function(){
     game.socket.on('draw', function(data){
       game.players = data.players;
       game.items = data.items;
     });
+  };
+
+  var socketGameOverHandler = function(){
+    game.socket.on('gameOver', function(data){
+      alert(data.msg);
+    });
+  }
+
+  game.init = function(){
+    game.players = {};
+    game.items = {};
+//    game.socket = io.connect('http://io.wolfgang-vogl.com:9000');
+    game.socket = io.connect('http://localhost:9000');
+
+    game.canvas = document.getElementById("canvas");
+
+    socketConnectHandler();
+    socketGameOverHandler();
+    socketDrawHandler();
 
     game.ctx = game.canvas.getContext("2d");
     game.update();
   };
+
 
 	game.drawRect = function(x,y,color){
 	  game.ctx.beginPath();
