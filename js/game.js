@@ -94,6 +94,9 @@
     game.drawItems();
 
     setTimeout(function(){return game.update()}, 100);
+
+    /* requestAnimationFrame(game.update); */
+
   }
 
   document.onkeydown = function(e){
