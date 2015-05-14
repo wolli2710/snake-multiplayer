@@ -1,6 +1,9 @@
 (function() {
+
+  var config = require('./config.js');
   //private variables
-  var io = require('socket.io').listen(9000);
+  var app = require('./app.js');
+  // var io = require('socket.io').listen(9000);
   var snake = require('./snake.js');
   var obj  = require('./item.js');
   //field variables
@@ -9,6 +12,12 @@
   var that = this;
   //save sockets per client
   var clients = [];
+
+  //start webserver
+  app.listen(config.server.port);
+
+
+  var io = require('socket.io')(app);
 
 
   //public variables
@@ -79,9 +88,7 @@
   }
 
   var socketConnectHandler = function(socket){
-    io.sockets.emit('connect', {
-      c: cell, l: line, w: that.canvasWidth, h: that.canvasHeight
-    });
+    io.emit('init', {"c": cell, "l": line, "w": that.canvasWidth, "h": that.canvasHeight} );
   }
 
   var socketDisconnectHandler = function(socket){
@@ -116,7 +123,7 @@
   var gameLoop = function(){
     isGameOver();
     //player.updatePosition();
-    io.sockets.emit('draw', {
+    io.emit('draw', {
       "players": that.players,
       "items": that.items
     });
@@ -124,7 +131,7 @@
   }
 
   //realtime server
-  io.sockets.on('connection', function(socket) {
+  io.on('connection', function(socket) {
     var id = socket.id;
     growField();
     clients[socket.id] = socket;

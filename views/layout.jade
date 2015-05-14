@@ -1,0 +1,14 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src=protocol+host+':'+port+'/socket.io/socket.io.js')
+    script.
+      protocol = "!{protocol}";
+      host = "!{host}";
+      port = !{port};
+  body
+    block content
+
+  script(type="text/javascript" src="javascripts/game.js")

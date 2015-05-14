@@ -1,9 +1,8 @@
-(function() {
-
+(function(global) {
   var game = {};
 
   var socketConnectHandler = function(){
-    game.socket.on('connect', function(data){
+    game.socket.on('init', function(data){
       game.cell = (data != undefined) ? data.c : game.cell;
       game.line = (data != undefined) ? data.l : game.line;
       document.getElementById("canvas").width = (data != undefined) ? data.w : document.getElementById("canvas").width;
@@ -22,13 +21,13 @@
     game.socket.on('gameOver', function(data){
       alert(data.msg);
     });
-  }
+  };
 
   game.init = function(){
     game.players = {};
     game.items = {};
-//    game.socket = io.connect('http://io.wolfgang-vogl.com:9000');
-    game.socket = io.connect('http://localhost:9000');
+    
+    game.socket = io.connect(global.protocol+global.host+':'+global.port);
 
     game.canvas = document.getElementById("canvas");
 
@@ -77,7 +76,7 @@
       else if(item.type === "f"){color="#f0f";}
       game.drawRect(item.x*(game.line+game.cell)+(game.line/2), item.y*(game.line+game.cell)+(game.line/2), color);
     }
-  }
+  };
 
 	game.drawBackground = function(){
 	  canvas.width = canvas.width;
@@ -94,16 +93,13 @@
     game.drawItems();
 
     setTimeout(function(){return game.update()}, 100);
-
-    /* requestAnimationFrame(game.update); */
-
-  }
+  };
 
   document.onkeydown = function(e){
     game.socket.emit("keyDown", {
       keyCode: e.keyCode
     });
-  }
+  };
 
   game.init();
-}).call(this);
+})(window);
